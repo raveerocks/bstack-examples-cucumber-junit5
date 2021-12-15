@@ -1,4 +1,3 @@
-@WebDriverFeature
 Feature: Product Feature
 
   Scenario: Apply Lowest to Highest Order By

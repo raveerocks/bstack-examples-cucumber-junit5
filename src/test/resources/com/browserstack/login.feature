@@ -1,4 +1,3 @@
-@WebDriverFeature
 Feature: Login Feature
 
   Scenario Outline: Login with given username

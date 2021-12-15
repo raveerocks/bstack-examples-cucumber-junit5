@@ -1,4 +1,3 @@
-@WebDriverFeature
 Feature: Offers Feature
 
   Scenario: Offers for Mumbai location
