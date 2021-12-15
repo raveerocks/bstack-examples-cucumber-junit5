@@ -16,7 +16,9 @@
         <cucumber.version>6.9.1</cucumber.version>
         <junit-platform.version>1.8.2</junit-platform.version>
         <junit-jupiter.version>5.7.0</junit-jupiter.version>
-        <aspectj.version>1.9.1</aspectj.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <logback.version>1.2.3</logback.version>
+
         <parallel.feature>true</parallel.feature>
         <parallel.platform>false</parallel.platform>
         <parallel.threads.count>5</parallel.threads.count>
@@ -68,6 +70,18 @@
             <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -77,12 +91,12 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M5</version>
                 <configuration>
+                    <skip>${parallel.platform}</skip>
                     <systemProperties>
                         <capabilities.config>${capabilities.config.file}</capabilities.config>
                         <parallel.feature>true</parallel.feature>
                         <cucumber.plugin>html:target/cucumber-html-reports.html</cucumber.plugin>
                     </systemProperties>
-                    <skip>${parallel.platform}</skip>
                     <properties>
                         <configurationParameters>
                             cucumber.junit-platform.naming-strategy=long
@@ -175,6 +189,9 @@
         </profile>
         <profile>
             <id>bstack-single</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <parallel.threads>${single.threads.count}</parallel.threads>
                 <capabilities.config.file>capabilities-single.yml</capabilities.config.file>
