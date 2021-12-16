@@ -34,7 +34,6 @@ public class TestListener implements ConcurrentEventListener {
     }
 
     public void markAndCloseWebDriver(TestCaseFinished testCaseFinished) {
-        System.out.println("Closing...." + Thread.currentThread());
         WebDriver webDriver = getWebDriver();
         try {
             if (webDriverFactory.isCloudDriver()) {

@@ -19,7 +19,9 @@
         <slf4j.version>1.7.25</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <aspectj.version>1.9.8.M1</aspectj.version>
+        <allure.version>2.17.2</allure.version>
         <jackson.version>2.12.2</jackson.version>
+
         <parallel.feature>true</parallel.feature>
         <parallel.platform>false</parallel.platform>
         <parallel.threads.count>5</parallel.threads.count>
@@ -86,7 +88,7 @@
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-cucumber6-jvm</artifactId>
-            <version>2.17.2</version>
+            <version>${allure.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -112,7 +114,7 @@
                         <capabilities.config>${capabilities.config.file}</capabilities.config>
                         <parallel.feature>true</parallel.feature>
                         <cucumber.plugin>io.qameta.allure.cucumber6jvm.AllureCucumber6Jvm ,
-                            com.browserstack.TestListener
+                            com.browserstack.TestListener,json:target/cucumber/report.json
                         </cucumber.plugin>
                     </systemProperties>
                     <properties>
@@ -123,6 +125,7 @@
                             cucumber.execution.parallel.config.fixed.parallelism=${parallel.threads}
                             cucumber.publish.enabled=true
                             cucumber.filter.name=${tests.suite}
+                            cucumber.publish.quiet
                         </configurationParameters>
                     </properties>
                 </configuration>
@@ -154,6 +157,18 @@
                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
                     <systemProperties>
                         <property>
+                            <key>cucumber.junit-platform.naming-strategy</key>
+                            <value>long</value>
+                        </property>
+                        <property>
+                            <key>cucumber.publish.enabled</key>
+                            <value>true</value>
+                        </property>
+                        <property>
+                            <key>cucumber.filter.name</key>
+                            <value>${tests.suite}</value>
+                        </property>
+                        <property>
                             <key>cucumber.publish.quiet</key>
                             <value>true</value>
                         </property>
@@ -165,10 +180,6 @@
                         <property>
                             <key>capabilities.config</key>
                             <value>${capabilities.config.file}</value>
-                        </property>
-                        <property>
-                            <key>cucumber.filter.name</key>
-                            <value>${tests.suite}</value>
                         </property>
                         <property>
                             <key>parallel.threads</key>
