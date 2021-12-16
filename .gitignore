@@ -3,3 +3,8 @@
 /allure-results/
 /allure-report/
 .DS_Store
+/gradlew
+/gradlew.bat
+/gradle/
+/build/
+/.gradle/
