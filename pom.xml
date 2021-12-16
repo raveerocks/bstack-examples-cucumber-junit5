@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,17 +13,18 @@
         <maven.compiler.target>8</maven.compiler.target>
         <wedriver.core.version>0.0.1</wedriver.core.version>
         <selenium-java.version>3.141.59</selenium-java.version>
-        <cucumber.version>6.9.1</cucumber.version>
+        <cucumber.version>6.11.0</cucumber.version>
         <junit-platform.version>1.8.2</junit-platform.version>
         <junit-jupiter.version>5.7.0</junit-jupiter.version>
         <slf4j.version>1.7.25</slf4j.version>
         <logback.version>1.2.3</logback.version>
-
+        <aspectj.version>1.9.8.M1</aspectj.version>
+        <allure.version>2.17.2</allure.version>
+        <jackson.version>2.12.2</jackson.version>
         <parallel.feature>true</parallel.feature>
         <parallel.platform>false</parallel.platform>
         <parallel.threads.count>5</parallel.threads.count>
         <single.threads.count>1</single.threads.count>
-        <tests.suite>End.*</tests.suite>
         <tests.all>.*</tests.all>
         <tests.single>End to End Scenario</tests.single>
     </properties>
@@ -33,6 +34,7 @@
             <groupId>com.browserstack</groupId>
             <artifactId>webdriver-framework-core</artifactId>
             <version>${wedriver.core.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -82,6 +84,18 @@
             <version>${logback.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-cucumber6-jvm</artifactId>
+            <version>${allure.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -92,10 +106,17 @@
                 <version>3.0.0-M5</version>
                 <configuration>
                     <skip>${parallel.platform}</skip>
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                        -Dcucumber.options="--plugin io.qameta.allure.cucumber6jvm.AllureCucumber6Jvm"
+                    </argLine>
                     <systemProperties>
                         <capabilities.config>${capabilities.config.file}</capabilities.config>
                         <parallel.feature>true</parallel.feature>
-                        <cucumber.plugin>html:target/cucumber-html-reports.html</cucumber.plugin>
+                        <cucumber.plugin>com.browserstack.TestListener
+                            ,io.qameta.allure.cucumber6jvm.AllureCucumber6Jvm
+                            ,json:target/cucumber/report.json
+                        </cucumber.plugin>
                     </systemProperties>
                     <properties>
                         <configurationParameters>
@@ -105,9 +126,17 @@
                             cucumber.execution.parallel.config.fixed.parallelism=${parallel.threads}
                             cucumber.publish.enabled=true
                             cucumber.filter.name=${tests.suite}
+                            cucumber.publish.quiet=true
                         </configurationParameters>
                     </properties>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -129,20 +158,29 @@
                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
                     <systemProperties>
                         <property>
+                            <key>cucumber.junit-platform.naming-strategy</key>
+                            <value>long</value>
+                        </property>
+                        <property>
+                            <key>cucumber.publish.enabled</key>
+                            <value>true</value>
+                        </property>
+                        <property>
+                            <key>cucumber.filter.name</key>
+                            <value>${tests.suite}</value>
+                        </property>
+                        <property>
                             <key>cucumber.publish.quiet</key>
                             <value>true</value>
                         </property>
                         <property>
                             <key>cucumber.plugin</key>
-                            <value>html:target/cucumber-html-reports.html</value>
+                            <value>io.qameta.allure.cucumber6jvm.AllureCucumber6Jvm , com.browserstack.TestListener
+                            </value>
                         </property>
                         <property>
                             <key>capabilities.config</key>
                             <value>${capabilities.config.file}</value>
-                        </property>
-                        <property>
-                            <key>cucumber.filter.name</key>
-                            <value>${tests.suite}</value>
                         </property>
                         <property>
                             <key>parallel.threads</key>
@@ -150,6 +188,13 @@
                         </property>
                     </systemProperties>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
@@ -183,7 +228,7 @@
             <id>docker-parallel</id>
             <properties>
                 <parallel.threads>${parallel.threads.count}</parallel.threads>
-                <capabilities.config.file>capabilities-docker.yml</capabilities.config.file>
+                <capabilities.config.file>capabilities-docker-parallel.yml</capabilities.config.file>
                 <tests.suite>${tests.all}</tests.suite>
             </properties>
         </profile>
@@ -215,6 +260,17 @@
             </properties>
         </profile>
         <profile>
+            <id>bstack-local-parallel-browsers-</id>
+            <properties>
+                <parallel.threads>${parallel.threads.count}</parallel.threads>
+                <capabilities.config.file>capabilities-local-parallel-browsers.yml</capabilities.config.file>
+                <tests.suite>${tests.all}</tests.suite>
+                <parallel.feature>false</parallel.feature>
+                <parallel.platform>true</parallel.platform>
+            </properties>
+        </profile>
+
+        <profile>
             <id>bstack-parallel</id>
             <properties>
                 <parallel.threads>${parallel.threads.count}</parallel.threads>
@@ -233,4 +289,5 @@
             </properties>
         </profile>
     </profiles>
+
 </project>

@@ -29,7 +29,7 @@ public class CommonSteps {
     @And("I type {string} in {string}")
     public void iTypeIn(String text, String inputName) {
         WebDriverWait wait = new WebDriverWait(stepData.getWebDriver(), 5);
-        if(inputName.equalsIgnoreCase("username")){
+        if (inputName.equalsIgnoreCase("username")) {
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#username > div > div:nth-child(1)"))).click();
             stepData.getWebDriver().findElement(By.id("react-select-2-input")).sendKeys(text);
             stepData.getWebDriver().findElement(By.id("react-select-2-input")).sendKeys(Keys.ENTER);

@@ -14,21 +14,18 @@ public class ParallelPlatformTest {
     public static WebDriverFactory webDriverFactory = WebDriverFactory.getInstance();
 
     public static void main(String[] args) {
-        int threadCount = Integer.parseInt(System.getProperty("parallel.threads","1"));
-        ExecutorService pool = Executors.newFixedThreadPool(threadCount);
-        for(Platform platform : webDriverFactory.getPlatforms()){
-            Runnable task = new Task(platform,threadLocalValue);
-            pool.execute(task);
-        }
+        int threadCount = Integer.parseInt(System.getProperty("parallel.threads", "1"));
+        ExecutorService pool = Executors.newFixedThreadPool(threadCount, new PlatformThreadFactory());
+        webDriverFactory.getPlatforms().forEach(platform -> pool.submit(new Task(platform, threadLocalValue)));
         pool.shutdown();
     }
 
-    private static class Task implements Runnable{
+    private static class Task implements Runnable {
 
         private Platform platform;
         private ThreadLocal<Platform> threadLocal;
 
-        public Task(Platform platform,ThreadLocal<Platform> threadLocal ) {
+        public Task(Platform platform, ThreadLocal<Platform> threadLocal) {
             this.platform = platform;
             this.threadLocal = threadLocal;
         }
