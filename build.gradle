@@ -50,7 +50,9 @@ ext.cucumberCommon = ['cucumber.junit-platform.naming-strategy'    : long,
                       'cucumber.execution.parallel.config.strategy': 'fixed',
                       'cucumber.publish.enabled'                   : true,
                       'cucumber.publish.quiet'                     : true,
-                      'cucumber.plugin'                            : 'com.browserstack.TestListener']
+                      'cucumber.plugin'                            : 'com.browserstack.TestListener,' +
+                              'io.qameta.allure.cucumber6jvm.AllureCucumber6Jvm,' +
+                              'json:target/cucumber/report.json']
 ext.featureParallel = ['parallel.feature' : 'true',
                        'parallel.platform': 'false']
 ext.platformParallel = ['parallel.feature' : 'false',
