@@ -21,12 +21,10 @@
         <aspectj.version>1.9.8.M1</aspectj.version>
         <allure.version>2.17.2</allure.version>
         <jackson.version>2.12.2</jackson.version>
-
         <parallel.feature>true</parallel.feature>
         <parallel.platform>false</parallel.platform>
         <parallel.threads.count>5</parallel.threads.count>
         <single.threads.count>1</single.threads.count>
-        <tests.suite>End.*</tests.suite>
         <tests.all>.*</tests.all>
         <tests.single>End to End Scenario</tests.single>
     </properties>
@@ -36,6 +34,7 @@
             <groupId>com.browserstack</groupId>
             <artifactId>webdriver-framework-core</artifactId>
             <version>${wedriver.core.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -89,12 +88,13 @@
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-cucumber6-jvm</artifactId>
             <version>${allure.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -113,8 +113,9 @@
                     <systemProperties>
                         <capabilities.config>${capabilities.config.file}</capabilities.config>
                         <parallel.feature>true</parallel.feature>
-                        <cucumber.plugin>io.qameta.allure.cucumber6jvm.AllureCucumber6Jvm ,
-                            com.browserstack.TestListener,json:target/cucumber/report.json
+                        <cucumber.plugin>com.browserstack.TestListener
+                            ,io.qameta.allure.cucumber6jvm.AllureCucumber6Jvm
+                            ,json:target/cucumber/report.json
                         </cucumber.plugin>
                     </systemProperties>
                     <properties>
@@ -125,7 +126,7 @@
                             cucumber.execution.parallel.config.fixed.parallelism=${parallel.threads}
                             cucumber.publish.enabled=true
                             cucumber.filter.name=${tests.suite}
-                            cucumber.publish.quiet
+                            cucumber.publish.quiet=true
                         </configurationParameters>
                     </properties>
                 </configuration>
@@ -227,7 +228,7 @@
             <id>docker-parallel</id>
             <properties>
                 <parallel.threads>${parallel.threads.count}</parallel.threads>
-                <capabilities.config.file>capabilities-docker.yml</capabilities.config.file>
+                <capabilities.config.file>capabilities-docker-parallel.yml</capabilities.config.file>
                 <tests.suite>${tests.all}</tests.suite>
             </properties>
         </profile>
@@ -258,6 +259,17 @@
                 <tests.suite>${tests.all}</tests.suite>
             </properties>
         </profile>
+        <profile>
+            <id>bstack-local-parallel-browsers-</id>
+            <properties>
+                <parallel.threads>${parallel.threads.count}</parallel.threads>
+                <capabilities.config.file>capabilities-local-parallel-browsers.yml</capabilities.config.file>
+                <tests.suite>${tests.all}</tests.suite>
+                <parallel.feature>false</parallel.feature>
+                <parallel.platform>true</parallel.platform>
+            </properties>
+        </profile>
+
         <profile>
             <id>bstack-parallel</id>
             <properties>

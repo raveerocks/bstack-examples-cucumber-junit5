@@ -15,6 +15,7 @@ public final class Utility {
             "}";
     private static final String OFFER_LATITUDE = "19";
     private static final String OFFER_LONGITUDE = "72";
+
     private Utility() {
     }
 
